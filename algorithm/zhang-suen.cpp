@@ -3,16 +3,95 @@
 #include <cmath>
 using namespace std;
 
-int mat[1000][1000];
-int root[1000][1000];
+vector <vector <int> > mat(1000, vector <int> (1000));
+vector <vector <int> > root(1000, vector <int> (1000));
 int row = 450;
 int col = 800;
+
+namespace thinning{
+    bool find_pixel_delete(string dir, vector <vector <int> > &pic, vector <vector <int> > &root){
+        int row = (int)pic.size();
+        int col = (int)pic[0].size();
+        int neighbor_pixel[9];
+        int connectivity;
+        bool need_more_delete_pixel = 0;
+        for(int i = 0; i < row; ++i){
+            for(int j = 0; j < col; ++j){
+                int count = 0;
+                if(pic[i][j] == 255){
+                    for(int k = -1; k <= 1; ++k){
+                        for(int z = -1; z <= 1; ++z){
+                            if(pic[i + k][j + z] == 255)++count;
+                        }
+                    }
+                }
+                if(count > 2 && count < 8){
+                    neighbor_pixel[0] = pic[i - 1][j - 1];
+                    neighbor_pixel[1] = pic[i][j - 1];
+                    neighbor_pixel[2] = pic[i + 1][j - 1];
+                    neighbor_pixel[3] = pic[i + 1][j];
+                    neighbor_pixel[4] = pic[i + 1][j + 1];
+                    neighbor_pixel[5] = pic[i][j + 1];
+                    neighbor_pixel[6] = pic[i - 1][j + 1];
+                    neighbor_pixel[7] = pic[i - 1][j];
+                    neighbor_pixel[8] = pic[i - 1][j - 1];
+                }
+                //주변 3*3 반경 픽셀에서 캐릭터 픽셀과 배경 픽셀 변환 지점 갯수 확인(connectivity)
+                connectivity = 0;
+                
+                for(int l = 0; l < 8; ++l){
+                    if(neighbor_pixel[l] == 255 && neighbor_pixel[l + 1] == 0) ++connectivity;
+                }
+
+                if(connectivity == 1){
+                    if(dir == "left_down"){
+                        if(neighbor_pixel[1] == 0 || neighbor_pixel[3] == 0 || neighbor_pixel[7] == 0){
+                            if(neighbor_pixel[1] == 0|| neighbor_pixel[3] == 0 || neighbor_pixel[5] == 0){
+                                root[i][j] = 1;
+                                need_more_delete_pixel = 1;
+                                
+                            }
+                        }
+                    }
+                    else if(dir == "right_top"){
+                        if(neighbor_pixel[3] == 0 || neighbor_pixel[5] == 0|| neighbor_pixel[7] == 0){
+                            if(neighbor_pixel[1] == 0|| neighbor_pixel[5] == 0|| neighbor_pixel[7] == 0){
+                                root[i][j] = 1;
+                                need_more_delete_pixel = 1;
+                                
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        for(int i = 0; i < row; ++i){
+            for(int j = 0; j < col; ++j){
+                if(root[i][j] == 1){
+                    pic[i][j] = 0;
+                }
+            }
+        }
+        
+        return need_more_delete_pixel;
+    }
+    
+    void zhang_suen(vector <vector <int> > &pic, vector <vector <int> > &root){
+        bool need_thinning = true;
+        
+        while(need_thinning){
+            need_thinning = find_pixel_delete("left_down", pic, root);
+            if(need_thinning) break;
+            need_thinning = find_pixel_delete("right_top", pic, root);
+        }
+        
+    }
+    
+};
+
 int main(void){
-    int que = 1;
     int color;
-    int count;
-    int neighbor[9];
-    int connectivity;
     FILE *fp;
     
     if((fp = fopen("/Users/kimjunseok/PycharmProjects/pythonProject/character.txt", "r")) == NULL){
@@ -26,110 +105,10 @@ int main(void){
         }
     }
     fclose(fp);
-    printf("d");
-    while(que){
-        que = 0;
-        for(int i = 1; i < row - 1; ++i){
-            for(int j = 1; j < col - 1; ++j){
-                count = 0;
-                if(mat[i][j] == 255){
-                    for(int k = -1; k <= 1; ++k){
-                        for(int z = -1; z <= 1; ++z){
-                            if(mat[i + k][j + z] == 255)++count;
-                        }
-                    }
-                    if(count > 2 && count < 8){
-                        neighbor[0]= mat[i - 1][j - 1];
-                        neighbor[1] = mat[i][j - 1];
-                        neighbor[2] = mat[i + 1][j - 1];
-                        neighbor[3]= mat[i + 1][j];
-                        neighbor[4] = mat[i + 1][j + 1];
-                        neighbor[5] = mat[i][j + 1];
-                        neighbor[6]= mat[i - 1][j + 1];
-                        neighbor[7] = mat[i - 1][j];
-                        neighbor[8] = mat[i - 1][j - 1];
-                        
-                        connectivity = 0;
-                        for(int l = 0; l < 8; ++l){
-                            if(neighbor[l] == 255 && neighbor[l + 1] == 0) ++connectivity;
-                        }
-                        if(connectivity == 1){
-                            if(neighbor[1] == 0 || neighbor[3] == 0 || neighbor[7] == 0){
-                                if(neighbor[1] == 0|| neighbor[3] == 0 || neighbor[5] == 0){
-                                    root[i][j] = 1;
-                                    que = 1;
-                                    
-                                }
-                            }
-                        }
-                        
-                    }
-                }
-            }
-        }
-        for(int i = 0; i < row; ++i){
-            for(int j = 0; j < col; ++j){
-                if(root[i][j] == 1){
-                    mat[i][j] = 0;
-                }
-            }
-        }
-        
-        if(que == 0) break;
-        que = 0;
-        
-        for(int i = 1; i < row - 1; ++i){
-            for(int j = 1; j < col - 1; ++j){
-                
-                count = 0;
-                if(mat[i][j] == 255){
-                    for(int k = -1; k <= 1; ++k){
-                        for(int z = -1; z <= 1; ++z){
-                            if(mat[i + k][j + z] == 255)++count;
-                        }
-                    }
-                    if(count > 2 && count < 8){
-                        neighbor[0]= mat[i - 1][j - 1];
-                        neighbor[1] = mat[i][j - 1];
-                        neighbor[2] = mat[i + 1][j - 1];
-                        neighbor[3]= mat[i + 1][j];
-                        neighbor[4] = mat[i + 1][j + 1];
-                        neighbor[5] = mat[i][j + 1];
-                        neighbor[6]= mat[i - 1][j + 1];
-                        neighbor[7] = mat[i - 1][j];
-                        neighbor[8] = mat[i - 1][j - 1];
-                        
-                        connectivity = 0;
-                        for(int l = 0; l < 8; ++l){
-                            if(neighbor[l] == 255 && neighbor[l + 1] == 0) ++connectivity;
-                        }
-                        if(connectivity == 1){
-                            if(neighbor[3] == 0 || neighbor[5] == 0|| neighbor[7] == 0){
-                                if(neighbor[1] == 0|| neighbor[5] == 0|| neighbor[7] == 0){
-                                    root[i][j] = 1;
-                                    que = 1;
-                                    
-                                }
-                            }
-                        }
-                        
-                    }
-                }
-                
-            }
-        }
-        for(int i = 0; i < row; ++i){
-            for(int j = 0; j < col; ++j){
-                if(root[i][j] == 1){
-                    mat[i][j] = 0;
-                }
-            }
-        }
-    }
     
+    thinning::zhang_suen(mat, root);
     
-    
-    if((fp = fopen("/Users/kimjunseok/PycharmProjects/pythonProject/thinning.txt", "w")) == NULL){
+    if((fp = fopen("/Users/kimjunseok/PycharmProjects/pythonProject/thinning2.txt", "w")) == NULL){
         printf("sorry");
     }
     for(int i = 0; i < row; ++i){
