@@ -94,7 +94,7 @@ int main(void){
     int color;
     FILE *fp;
     
-    if((fp = fopen("/Users/kimjunseok/PycharmProjects/pythonProject/character.txt", "r")) == NULL){
+    if((fp = fopen("address", "r")) == NULL){
         printf("sorry");
     }
     
@@ -108,7 +108,7 @@ int main(void){
     
     thinning::zhang_suen(mat, root);
     
-    if((fp = fopen("/Users/kimjunseok/PycharmProjects/pythonProject/thinning2.txt", "w")) == NULL){
+    if((fp = fopen("address", "w")) == NULL){
         printf("sorry");
     }
     for(int i = 0; i < row; ++i){
