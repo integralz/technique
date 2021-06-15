@@ -1,7 +1,4 @@
-/* Output the vertex position to the fragment shader using the out keyword and set the fragment's color equal to this vertex position (see how even the vertex position values are interpolated across the triangle). Once you managed to do this; try to answer the following question: why is the bottom-left side of our triangle black?
- */
-/*위에 대한 해답: 음수에 해당하는 값은 색을 표현할 수 없으므로 이는 0.0f로 처리가 된다. 그러므로 좌하단은 검은 색으로 표시가 된다.
- */
+/*textures_example1*/
 #define GLEW_STATIC
 #define STB_IMAGE_IMPLEMENTATION
 
