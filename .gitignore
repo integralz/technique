@@ -1,5 +1,6 @@
 *.DS_Store
 stb-master/
 texture/
+glm/
 .github
 .travis.yml
