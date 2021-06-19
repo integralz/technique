@@ -1,4 +1,6 @@
-/*Transformations example
+/*Using the last transformation on the container, try switching the order around by first rotating and then translating. See what happens and try to reason why this happens
+ */
+/*  답변 : OpenGL에서 변환은 역순으로 이루어진다. 물론 정순으로 이루어 진다고 하여도 대칭변환이 들어가 있기 떄문에 상자의 위치가 달라지지만 역순으로 직접 생각을 해본다면 역순으로 변환이 이루어져 그려지는 것을 알 수 있다. 이러한 이유를 생각해보면, 첫번째로, 행렬의 곱셈에는 기본적으로 교환법칙이 성립하지 않고(제한적으로는 성립한다.), 두번째로 역순으로 이루어지는 이유를 생각해본다면, 어떠한 두 변환 행렬에 대해서 A,B라고 한다면 A를 먼저 구현하고 B를 구현한다면 A*B꼴로 나타날 것이다. 그리고 이를 C 좌표에 대입을 하면 A*B*C이고 이는 A*(B*C)꼴로 결합을 할 수 있고, 즉 역순으로 실행이 될 수 밖에 없다는 것을 알 수 있다.
  */
 #define GLEW_STATIC
 #define STB_IMAGE_IMPLEMENTATION
@@ -186,7 +188,6 @@ int main(){
     stbi_image_free(data);
     
     glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
     trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
     trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
     
